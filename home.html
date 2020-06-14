@@ -11,8 +11,11 @@
     </head>
 
     <body>
-        <div style="text-align:center">
-            <canvas id="mainCanvas" width="200" height="100" style="border:1px solid #000000;"></canvas>
+        <div style="text-align:center;">
+            <div style="z-index: 1;"><input type="file" id="backgroundImage" name="filename"></div>
+            <div style="z-index: 2;"><canvas id="mainCanvas" width="750" height="400" style="border:1px solid #000000;"></canvas></div>
+            <div style="z-index: 3;"><input type="text" id="pathName" placeholder="enter the name of the path"></div>
+            <textarea placeholder="console" readonly cols="48" rows="10"></textarea>
         </div>
     </body>
 </html>
