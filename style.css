@@ -5,23 +5,28 @@ ul {
 
 #leftButtons {
     position: relative;
-    top: 50px;
-    left: 115px;
+    top: 7px;
+    left: 75px;
 }
 
 #middleStuff {
     position:absolute;
-    left: 265px;
+    left: 215px;
+    top: 15px;
 }
 
 #rightButtons {
     position: absolute;
-    left: 1035px;
-    top: 60px;
+    left: 965px;
+    top: 16px;
 }
 
 #backgroundImage {
+    position: relative;
+    top: 5px;
     margin: 0 0 5px 0;
+    width: 78px;
+    height: 30px;
 }
 
 #mainCanvas {
@@ -29,11 +34,35 @@ ul {
 }
 
 #pathName {
-    margin: 0 0 5px 0;
+    width: 223px;
 }
 
-.Button {
+#console {
+    background-color: black;
+    color: lightgrey;
+}
+
+.rightButton {
     margin: 0 0 5px 0;
     width: 125px;
-    height: 65px;
+    height: 36px;
+    border-radius: 0.8vmin;
+}
+
+.rightButton:hover {
+    background-color: lightgray;
+}
+
+.pathButton {
+    width: 73px;
+    height: 49px;
+    border-radius: 0.8vmin;
+}
+
+.pathButton:hover {
+    background-color: lightgray;
+}
+
+.topRight {
+    display: inline;
 }

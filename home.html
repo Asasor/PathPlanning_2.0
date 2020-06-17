@@ -14,30 +14,30 @@
         <div style="text-align:center;">
             <!-- left buttons -->
             <ul id="leftButtons">
-                <li><button class="Button" type="button">Delete Point</button></li>
-                <li><button class="Button" type="button">Move Point</button></li>
-                <li><button class="Button" type="button">Ruler</button></li>
-                <li><button class="Button" type="button">Mirror Mode</button></li>
-                <li><button class="Button" type="button">Mirror Path</button></li>
-                <li><button class="Button" type="button">Save This Path</button></li>
+                <li><button class="rightButton" type="button">Delete Point</button></li>
+                <li><button class="rightButton" type="button">Move Point</button></li>
+                <li><button class="rightButton" type="button">Ruler</button></li>
+                <li><button class="rightButton" type="button">Mirror Mode</button></li>
+                <li><button class="rightButton" type="button">Mirror Path</button></li>
+                <li><button class="rightButton" type="button">Get Path Info</button></li>
+                <li><button class="rightButton" type="button">Set Segment</button></li>
+                <li><button class="rightButton" type="button">Move Point</button></li>
+                <li><button class="rightButton" type="button">Reverse Segment</button></li>
+                <li><button class="rightButton" type="button">Clear Canvas</button></li>
             </ul>
 
             <!-- weird stuff in the middle -->
             <ul id="middleStuff">
-                <li><input type="file" id="backgroundImage" name="filename"></li>
                 <li><canvas id="mainCanvas" width="750" height="400" style="border:1px solid #000000;"></canvas></li>
-                <li><input type="text" id="pathName" placeholder="enter the name of the path"></li>
-                <li><textarea placeholder="console" readonly cols="48" rows="10"></textarea></li>
             </ul>
 
             <!-- right buttons -->
             <ul id="rightButtons">
-                <li><button class="Button" type="button">Get Path Info</button></li>
-                <li><button class="Button" type="button">Set Segment</button></li>
-                <li><button class="Button" type="button">Move Point</button></li>
-                <li><button class="Button" type="button">Reverse Segment</button></li>
-                <li><button class="Button" type="button">Clear Canvas</button></li>
-                <li><button class="Button" type="button">Draw This Path</button></li>
+                <li class="topRight"><button class="pathButton" type="button">Save This Path</button></li>
+                <li class="topRight"><input type="file" id="backgroundImage" name="filename"></li>
+                <li class="topRight"><button class="pathButton" type="button">Draw This Path</button></li>
+                <li><input type="text" id="pathName" placeholder="enter the name of the path"></li>
+                <li><textarea id="console" placeholder="console" readonly cols="30" rows="22"></textarea></li>
             </ul>
         </div>
     </body>
