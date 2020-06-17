@@ -1,0 +1,37 @@
+ul {
+    list-style-type: none;
+    float: left;
+}
+
+#leftButtons {
+    position: relative;
+    top: 50px;
+    left: 100px;
+}
+
+#middleStuff {
+    position:absolute;
+    left: 250px;
+}
+
+#rightButtons {
+    position: absolute;
+    left: 1040px;
+    top: 60px;
+}
+
+#backgroundImage {
+
+}
+
+#mainCanvas {
+
+}
+
+#pathName {
+
+}
+
+.Button {
+    margin: 0 0 35px 0;
+}
