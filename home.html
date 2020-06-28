@@ -7,10 +7,11 @@
         <meta name="description" content="An FRC Autonomous Path drawing website developed by Asaf Soreq for team 5951.">
         <meta name="author" content="Asaf Soreq">
         <link rel="stylesheet" href="style.css"> <!-- specify to use style.css as the project's style sheet -->
-        <script async src="./javascript/pathPlanning_JavaScript.js"></script> <!-- specify to use pathPlanning_JavaScript as the project's javascript script -->
     </head>
 
     <body>
+        <script async src="pathPlanning_JavaScript.js"></script> <!-- specify to use pathPlanning_JavaScript as the project's javascript script -->
+
         <div style="text-align:center;">
             <!-- left buttons -->
             <ul id="leftButtons">
@@ -33,8 +34,10 @@
 
             <!-- right buttons -->
             <ul id="rightButtons">
+                <li><input type="file" id="backgroundImage" name="filename"></li>
+
                 <li class="topRight"><button class="pathButton" type="button">Save This Path</button></li>
-                <li class="topRight"><input type="file" id="backgroundImage" name="filename"></li>
+                <li class="topRight"><button class="pathButton" type="button">Set</button></li>
                 <li class="topRight"><button class="pathButton" type="button">Draw This Path</button></li>
                 <li><input type="text" id="pathName" placeholder="enter the name of the path"></li>
                 <li><textarea id="console" placeholder="console" readonly cols="30" rows="22"></textarea></li>
