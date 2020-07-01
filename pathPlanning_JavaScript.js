@@ -32,9 +32,19 @@ function makeBase()
 
 function clearCanvas() {
     pointInfo = [];
-    
+
     context.fillStyle = "white"; // change later to background image from makebase instead of white
     context.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+
+function deletePoint() {
+    pointInfo.pop();
+
+    context.fillStyle = "white"; // change later to background image from makebase instead of white
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawPoints(context);
 }
 
 //---------------------- miscellaneous ----------------------
