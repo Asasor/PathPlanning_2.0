@@ -1,3 +1,5 @@
+//  use alert to debug
+
 var canvas = document.getElementById('mainCanvas'),
 context = canvas.getContext('2d');
 var pointInfo = [];
@@ -9,11 +11,9 @@ canvas.addEventListener('click', function(evt)  // left click listener
         var mousePos = getMousePos(canvas, evt);
 
         pointInfo.push(new Array());
-        pointInfo[pointInfo.length] = [mousePos.x, mousePos.y];
+        pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y];
 
-         // need to figure out how to add array (point) to json
-        // context.fillRect(mousePos.x, mousePos.y, 10, 10);
-        drawPoints(canvas);
+        drawPoints(context);
         // alert("working");
     }, false
 );
@@ -40,16 +40,31 @@ function getMousePos(canvas, evt) {
     };
 }
 
-function drawPoints(canvas) {
-    var start=true;
+function drawPoints(context) {
+    var start = true;
+    var lastPoint = pointInfo[0]; // save the last point at any given time for the arrow's orientation
 
-    context = this.canvas.getContext('2d');
     context.beginPath();
-    context.moveTo(pointInfo[0][0], pointInfo[0][1]);
     pointInfo.forEach((element) => {
         if (!start)
-        { context.lineTo(element[0],element[1]); }
+        {
+        arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]);
+        lastPoint = element;
+        }
         start = false;
     })
     context.stroke();
+}
+
+//  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
+function arrowTo(context, fromx, fromy, tox, toy) {
+  var headlen = 15; // length of head in pixels
+  var dx = tox - fromx;
+  var dy = toy - fromy;
+  var angle = Math.atan2(dy, dx);
+  context.moveTo(fromx, fromy);
+  context.lineTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+  context.moveTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
 }

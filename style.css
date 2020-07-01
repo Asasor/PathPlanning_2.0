@@ -23,8 +23,8 @@ ul {
 
 #backgroundImage {
     position: relative;
-    top: 5px;
-    left: 30px;
+    top: 12px;
+    left: 16px;
     margin: 0 0 10px 0;
 }
 
@@ -60,6 +60,11 @@ ul {
 
 #fileInputButton:hover {
     background-color: lightgray;
+}
+
+#topRightMiddle {
+    position: relative;
+    top: 8px;
 }
 
 .pathButton {
