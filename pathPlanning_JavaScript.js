@@ -20,14 +20,21 @@ canvas.addEventListener('click', function(evt)  // left click listener
 
 //---------------------- buttons ----------------------
 
-
-function make_base()
+function makeBase()
 {
   base_image = new Image();
   base_image.src = 'img/base.png';
   base_image.onload = function(){
     context.drawImage(base_image, 0, 0);
   }
+}
+
+
+function clearCanvas() {
+    pointInfo = [];
+    
+    context.fillStyle = "white"; // change later to background image from makebase instead of white
+    context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 //---------------------- miscellaneous ----------------------
@@ -39,6 +46,7 @@ function getMousePos(canvas, evt) {
         y: evt.clientY - rect.top
     };
 }
+
 
 function drawPoints(context) {
     var start = true;
@@ -55,6 +63,7 @@ function drawPoints(context) {
     })
     context.stroke();
 }
+
 
 //  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
 function arrowTo(context, fromx, fromy, tox, toy) {
