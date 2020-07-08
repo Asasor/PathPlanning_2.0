@@ -2,6 +2,12 @@
 
 var canvas = document.getElementById('mainCanvas'),
 context = canvas.getContext('2d');
+
+var imageLoader = document.getElementById('backgroundImage');
+imageLoader.addEventListener('change', makeBase, false);
+
+var movePointCond = false;
+var reverseCond = false;
 var pointInfo = [];
 
 
@@ -11,7 +17,7 @@ canvas.addEventListener('click', function(evt)  // left click listener
         var mousePos = getMousePos(canvas, evt);
 
         pointInfo.push(new Array());
-        pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y];
+        pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond];
 
         drawPoints(context);
         // alert("working");
@@ -20,22 +26,22 @@ canvas.addEventListener('click', function(evt)  // left click listener
 
 //---------------------- buttons ----------------------
 
-function makeBase()
-{
-  base_image = new Image();
-  base_image.src = 'img/base.png';
-  base_image.onload = function(){
-    context.drawImage(base_image, 0, 0);
+// taken from http://jsfiddle.net/influenztial/qy7h5/
+function makeBase(e){
+  var reader = new FileReader();
+  reader.onload = function(event){
+      var img = new Image();
+      img.onload = function(){
+          canvas.width = img.width;
+          canvas.height = img.height;
+          context.drawImage(img,0,0);
+      }
+      img.src = event.target.result;
   }
+  reader.readAsDataURL(e.target.files[0]);
+  clearCanvas();
 }
 
-
-function clearCanvas() {
-    pointInfo = [];
-
-    context.fillStyle = "white"; // change later to background image from makebase instead of white
-    context.fillRect(0, 0, canvas.width, canvas.height);
-}
 
 
 function deletePoint() {
@@ -45,6 +51,57 @@ function deletePoint() {
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     drawPoints(context);
+}
+
+
+function movePoint(Btn) { // not finished; need to implement moving point
+  movePointCond ^= 1; // flip bool
+  if (movePointCond)
+    { Btn.style.backgroundColor="lightgreen"; }
+  else
+    { Btn.style.backgroundColor='#FA8072'; }
+}
+
+
+function Ruler() {
+
+}
+
+
+function mirrorMode() {
+
+}
+
+
+function mirrorPath() {
+  
+}
+
+
+function GetPathInfo() {
+  
+}
+
+
+function setSegment() {
+
+}
+
+
+function reverseMode(Btn) {
+  reverseCond ^= 1; // flip bool
+  if (reverseCond)
+    { Btn.style.backgroundColor="lightgreen"; }
+  else
+    { Btn.style.backgroundColor='#FA8072'; }
+}
+
+
+function clearCanvas() {
+  pointInfo = [];
+
+  context.fillStyle = "white"; // change later to background image from makebase instead of white
+  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 //---------------------- miscellaneous ----------------------
@@ -66,7 +123,10 @@ function drawPoints(context) {
     pointInfo.forEach((element) => {
         if (!start)
         {
-        arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]);
+        if (!element[2]) // check if reverse mode is toggled
+          { arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
+        else
+          { arrowToReverse(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
         lastPoint = element;
         }
         start = false;
@@ -80,6 +140,18 @@ function arrowTo(context, fromx, fromy, tox, toy) {
   var headlen = 15; // length of head in pixels
   var dx = tox - fromx;
   var dy = toy - fromy;
+  var angle = Math.atan2(dy, dx);
+  context.moveTo(fromx, fromy);
+  context.lineTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+  context.moveTo(tox, toy);
+  context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+}
+
+function arrowToReverse(context, fromx, fromy, tox, toy) {
+  var headlen = 15; // length of head in pixels
+  var dx = fromx - tox;
+  var dy = fromy - toy;
   var angle = Math.atan2(dy, dx);
   context.moveTo(fromx, fromy);
   context.lineTo(tox, toy);
