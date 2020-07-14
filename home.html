@@ -16,13 +16,13 @@
             <!-- left buttons -->
             <ul id="leftButtons">
                 <li><button class="rightButton" type="button" onclick="deletePoint()">Delete Point</button></li>
-                <li><button class="rightButton" type="button" onclick="movePoint(this)" id="movePointBtn">Move Point</button></li>
-                <li><button class="rightButton" type="button" onclick="Ruler()">Ruler</button></li>
-                <li><button class="rightButton" type="button" onclick="mirrorMode()">Mirror Mode</button></li>
+                <li><button class="rightButton" type="button" onclick="movePoint(this)">Move Point</button></li>
+                <li><button class="rightButton" type="button" onclick="rulerMode(this)">Ruler</button></li>
+                <li><button class="rightButton" type="button" onclick="mirrorMode(this)">Mirror Mode</button></li>
                 <li><button class="rightButton" type="button" onclick="mirrorPath()">Mirror Path</button></li>
                 <li><button class="rightButton" type="button" onclick="getPathInfo()">Get Path Info</button></li>
                 <li><button class="rightButton" type="button" onclick="setSegment()">Set Segment</button></li>
-                <li><button class="rightButton" type="button" onclick="reverseMode(this)" id="reverseBtn">Reverse Segment</button></li>
+                <li><button class="rightButton" type="button" onclick="reverseMode(this)">Reverse Segment</button></li>
                 <li><button class="rightButton" type="button" onclick="clearCanvas()">Clear Canvas</button></li>
             </ul>
 
@@ -36,7 +36,7 @@
                 <li><input type="file" id="backgroundImage" name="filename"></li>
 
                 <li class="topRight"><button class="pathButton" type="button">Save This Path</button></li>
-                <li class="topRight" id="topRightMiddle"><button class="pathButton" type="button">Set</button></li>
+                <li class="topRight" id="topRightMiddle"><button class="pathButton" type="button">Set Path</button></li>
                 <li class="topRight"><button class="pathButton" type="button">Draw This Path</button></li>
                 <li><input type="text" id="pathName" placeholder="enter the name of the path"></li>
                 <li><textarea id="console" placeholder="console" readonly cols="30" rows="22"></textarea></li>
