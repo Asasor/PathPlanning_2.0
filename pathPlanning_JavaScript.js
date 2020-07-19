@@ -1,5 +1,4 @@
-//  use alert to debug
-
+//  use alert() and console.log() to debug
 var canvas = document.getElementById('mainCanvas'),
 context = canvas.getContext('2d');
 
@@ -27,15 +26,13 @@ canvas.addEventListener('click', function(evt)  // left click listener
         }
         
         else if (rulerCoords.length < 3)  // check if the ruler is active and there are a at most two points
-          { rulerCoords.push([mousePos.x, mousePos.y]); }  // make a ruler
-          
-        else 
-        {
-          clearCanvas();
-          drawPoints(context);
-          drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
-          rulerCoords = [true];
-        }
+          {  
+            rulerCoords.push([mousePos.x, mousePos.y]);
+            refresh(context);
+            drawPoints(context);
+            drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
+            rulerCoords = [true];
+          }  
 
         drawPoints(context);
         // alert("working");
@@ -108,7 +105,29 @@ function mirrorMode(Btn) {
 
 
 function mirrorPath() {
-
+  var mirrorPointInfo = JSON.parse(JSON.stringify(pointInfo));  // clone the point locations into a new reversed                                                                       array
+  mirrorPointInfo.reverse();
+  alert(pointInfo);
+ 
+  if (mirrorModeState == 1)
+  {
+  for (i = 0; i < mirrorPointInfo.length; i++)
+    {mirrorPointInfo[i][1] += 2 * (parseInt(canvas.height / 2) - mirrorPointInfo[i][1]);}
+  } 
+      
+  else if (mirrorModeState == 2)
+  {
+  for (i = 0; i < mirrorPointInfo.length; i++)
+    {mirrorPointInfo[i][0] += 2 * (parseInt(canvas.width / 2) - mirrorPointInfo[i][0]);}
+  }
+  
+  else
+    {mirrorPointInfo = [];}
+  
+  console.log(pointInfo, mirrorPointInfo);
+  pointInfo = pointInfo.concat(mirrorPointInfo); // add the mirrored points to the end of the pointInfo array
+  console.log(pointInfo);
+  drawPoints(context);
 }
 
 
@@ -139,6 +158,20 @@ function clearCanvas() {
 }
 
 //---------------------- miscellaneous ----------------------
+
+function drawGrid(context, canvasWidth, canvasHeight, realWidth, realHeight, realCellWidth, realCellHeight) {
+  // the real dimensions are calculated in centimeters
+  // the digital dimensions are calculated in pixels
+  
+  context.beginPath();
+  
+  var widthRatio =  canvasWidth / realWidth;
+  var heightRatio = canvasHeight / realHeight;
+  var cellWidth = realCellWidth * widthRatio;
+  var cellHeight = realCellHeight * heightRatio;
+
+  context.stroke();
+}
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -191,6 +224,7 @@ function drawMirror(context, width, height) {
     context.stroke();
 }
 
+
 //  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
 function arrowTo(context, fromx, fromy, tox, toy) {
   var headlen = 15; // length of head in pixels
@@ -219,22 +253,22 @@ function arrowToReverse(context, fromx, fromy, tox, toy) {
 function drawRuler(context, fromx, fromy, tox, toy) {
   context.beginPath();
 
-  var headlen = 15; // length of head in pixels
+  var widthlen = 15; // half the the width of the ruler in pixels
   var dx = fromx - tox;
   var dy = fromy - toy;
   var angle = Math.atan2(dy, dx);
   context.moveTo(fromx, fromy);
-  context.lineTo(fromx - headlen * Math.cos(angle - Math.PI / 2), fromy - headlen * Math.sin(angle - Math.PI / 2));
+  context.lineTo(fromx - widthlen * Math.cos(angle - Math.PI / 2), fromy - widthlen * Math.sin(angle - Math.PI / 2));
   context.moveTo(fromx, fromy);
-  context.lineTo(fromx - headlen * Math.cos(angle + Math.PI / 2), fromy - headlen * Math.sin(angle + Math.PI / 2));
+  context.lineTo(fromx - widthlen * Math.cos(angle + Math.PI / 2), fromy - widthlen * Math.sin(angle + Math.PI / 2));
   context.moveTo(fromx, fromy);
   context.lineTo(tox, toy);
-  context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 2), toy - headlen * Math.sin(angle - Math.PI / 2));
+  context.lineTo(tox - widthlen * Math.cos(angle - Math.PI / 2), toy - widthlen * Math.sin(angle - Math.PI / 2));
   context.moveTo(tox, toy);
-  context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 2), toy - headlen * Math.sin(angle + Math.PI / 2));
-  context.lineTo(fromx - headlen * Math.cos(angle + Math.PI / 2), fromy - headlen * Math.sin(angle + Math.PI / 2));
-  context.moveTo(tox - headlen * Math.cos(angle - Math.PI / 2), toy - headlen * Math.sin(angle - Math.PI / 2));
-  context.lineTo(fromx - headlen * Math.cos(angle - Math.PI / 2), fromy - headlen * Math.sin(angle - Math.PI / 2));
+  context.lineTo(tox - widthlen * Math.cos(angle + Math.PI / 2), toy - widthlen * Math.sin(angle + Math.PI / 2));
+  context.lineTo(fromx - widthlen * Math.cos(angle + Math.PI / 2), fromy - widthlen * Math.sin(angle + Math.PI / 2));
+  context.moveTo(tox - widthlen * Math.cos(angle - Math.PI / 2), toy - widthlen * Math.sin(angle - Math.PI / 2));
+  context.lineTo(fromx - widthlen * Math.cos(angle - Math.PI / 2), fromy - widthlen * Math.sin(angle - Math.PI / 2));
 
   context.stroke();
 }
