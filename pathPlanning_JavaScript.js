@@ -107,26 +107,24 @@ function mirrorMode(Btn) {
 function mirrorPath() {
   var mirrorPointInfo = JSON.parse(JSON.stringify(pointInfo));  // clone the point locations into a new reversed                                                                       array
   mirrorPointInfo.reverse();
-  alert(pointInfo);
- 
+
   if (mirrorModeState == 1)
   {
-  for (i = 0; i < mirrorPointInfo.length; i++)
+  for (i = 0; i < mirrorPointInfo.length; i++)  // mirror points vertically
     {mirrorPointInfo[i][1] += 2 * (parseInt(canvas.height / 2) - mirrorPointInfo[i][1]);}
   } 
       
   else if (mirrorModeState == 2)
   {
-  for (i = 0; i < mirrorPointInfo.length; i++)
+  for (i = 0; i < mirrorPointInfo.length; i++)  // mirror points horizontally
     {mirrorPointInfo[i][0] += 2 * (parseInt(canvas.width / 2) - mirrorPointInfo[i][0]);}
   }
   
   else
     {mirrorPointInfo = [];}
   
-  console.log(pointInfo, mirrorPointInfo);
-  pointInfo = pointInfo.concat(mirrorPointInfo); // add the mirrored points to the end of the pointInfo array
-  console.log(pointInfo);
+  
+  pointInfo = pointInfo.concat(mirrorPointInfo);  // add the mirrored points to the end of the pointInfo array
   drawPoints(context);
 }
 
