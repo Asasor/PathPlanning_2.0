@@ -100,7 +100,7 @@ function mirrorMode(Btn) {
   else
     {Btn.style.backgroundColor='';} // reset to default colour
 
-  drawMirror(context, 750, 400); // context, width, height
+  drawPoints(context);
 }
 
 
@@ -185,6 +185,7 @@ function refresh(context) { // a bit like clear canvas but retains information t
 }
 
 function drawPoints(context) {
+    refresh(context);
     var start = true;
     var lastPoint = pointInfo[0]; // save the last point at any given time for the arrow's orientation
     context.beginPath();
@@ -200,11 +201,11 @@ function drawPoints(context) {
         start = false;
     })
     context.stroke();
+
+    drawMirror(context, canvas.width, canvas.height);  // draw mirror
 }
 
 function drawMirror(context, width, height) {
-    refresh(context);
-    drawPoints(context);
 
     context.beginPath();
     if (mirrorModeState == 1)
@@ -217,8 +218,6 @@ function drawMirror(context, width, height) {
         context.moveTo(width/2,0);
         context.lineTo(width/2,height);
       }
-    else
-      { drawPoints(context); }
     context.stroke();
 }
 
