@@ -153,6 +153,7 @@ function clearCanvas() {
 
   context.fillStyle = "white"; // change later to background image from makebase instead of white
   context.fillRect(0, 0, canvas.width, canvas.height);
+  drawPoints(context);
 }
 
 //---------------------- miscellaneous ----------------------
