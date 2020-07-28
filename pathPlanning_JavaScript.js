@@ -21,9 +21,9 @@ var pointInfo = [];
 
 //---------------------- canvas interaction ----------------------
 canvas.addEventListener('click', function (evt) { // left click listener
-      
+    
     var mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
-
+    
     if (rulerCoords[0] === false) { // check whether a regular point or a ruler should be drawn
         // add a regular point
         pointInfo.push([]);
@@ -31,17 +31,11 @@ canvas.addEventListener('click', function (evt) { // left click listener
     } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
         rulerCoords.push([mousePos.x, mousePos.y]);
         refresh(context);
-          drawPoints(context);
-          drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
-          rulerCoords = [true];
-        }
-
->>>>>>> parent of f16d110... added functionality to the mirrorPath button.
         drawPoints(context);
         drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
         rulerCoords = [true]; 
     }
-
+    
     drawPoints(context);
     alert("working");
 }, false
@@ -104,7 +98,6 @@ function mirrorMode(Btn) {
 
 
 function mirrorPath() {
-<<<<<<< HEAD
   var mirrorPointInfo = JSON.parse(JSON.stringify(pointInfo));  // clone the point locations into a new reversed array
   mirrorPointInfo.reverse();
 
@@ -125,9 +118,6 @@ function mirrorPath() {
   
   pointInfo = pointInfo.concat(mirrorPointInfo);  // add the mirrored points to the end of the pointInfo array
   drawPoints(context);
-=======
-
->>>>>>> parent of f16d110... added functionality to the mirrorPath button.
 }
 
 
