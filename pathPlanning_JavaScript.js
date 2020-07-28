@@ -1,9 +1,6 @@
-<<<<<<< HEAD
-// use alert() and console.log() to debug
-=======
-//  use alert to debug
 
->>>>>>> parent of f16d110... added functionality to the mirrorPath button.
+// use alert() and console.log() to debug
+
 var canvas = document.getElementById('mainCanvas'),
     context = canvas.getContext('2d');
 
@@ -23,7 +20,6 @@ var pointInfo = [];
 
 
 //---------------------- canvas interaction ----------------------
-<<<<<<< HEAD
 canvas.addEventListener('click', function (evt) { // left click listener
       
     var mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
@@ -35,23 +31,6 @@ canvas.addEventListener('click', function (evt) { // left click listener
     } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
         rulerCoords.push([mousePos.x, mousePos.y]);
         refresh(context);
-=======
-canvas.addEventListener('click', function(evt)  // left click listener
-    {
-        var mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
-
-        if (rulerCoords[0] == false)  // check whether a regular point or a ruler should be drawn
-        {  // add a regular point
-          pointInfo.push(new Array());
-          pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond];
-        }
-        
-        else if (rulerCoords.length < 3)  // check if the ruler is active and there are a at most two points
-          { rulerCoords.push([mousePos.x, mousePos.y]); }  // make a ruler
-          
-        else 
-        {
-          clearCanvas();
           drawPoints(context);
           drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
           rulerCoords = [true];
