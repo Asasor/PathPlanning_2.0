@@ -37,7 +37,6 @@ canvas.addEventListener('click', function (evt) { // left click listener
     }
     
     drawPoints(context);
-    alert("working");
 }, false
 );
 
@@ -142,7 +141,7 @@ function reverseMode(Btn) {
 
 function clearCanvas() {
   pointInfo = [];
-<<<<<<< HEAD
+
   alert(typeof(img.src)); // debugging; remove later.
   if (typeof(img.src) == string) // if the image is active
   {
@@ -157,11 +156,9 @@ function clearCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
   drawPoints(context);
-=======
 
   context.fillStyle = "white"; // change later to background image from makebase instead of white
   context.fillRect(0, 0, canvas.width, canvas.height);
->>>>>>> parent of 2cd901d... fixed another mirror display glitch
 }
 
 //---------------------- miscellaneous ----------------------
@@ -175,12 +172,14 @@ function getMousePos(canvas, evt) {
 }
 
 function refresh(context) { // a bit like clear canvas but retains information that clear canvas erases
-  alert(typeof(img.src)); // debugging; remove later.
-  if (typeof(img.src) == string) // if the image is active
+  if (img) // check if a background was uploaded
   {
-    canvas.width = img.width;
-    canvas.height = img.height;
-     context.drawImage(img,0,0);
+    if (typeof(img.src) === "string") // if the image is active
+    {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      context.drawImage(img,0,0);
+    }
   }
       
   else // otherwise (if the image is not active) 
@@ -191,23 +190,23 @@ function refresh(context) { // a bit like clear canvas but retains information t
 }
 
 function drawPoints(context) {
-    //alert("working");
-    refresh(context);
+    // alert("working");
+    refresh(context); // not working
     var start = true;
     var lastPoint = pointInfo[0]; // save the last point at any given time for the arrow's orientation
     context.beginPath();
     
- /*   pointInfo.forEach((element) => {
+    pointInfo.forEach((element) => {
         if (!start)
         {
         if (!element[2]) // check if reverse mode is toggled
           { arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
         else
           { arrowToReverse(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
-        lastPoint = element;
         }
+        lastPoint = element;
         start = false;
-    })  not working fix later */ 
+    })
     
     context.stroke();
 
