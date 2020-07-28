@@ -142,6 +142,7 @@ function reverseMode(Btn) {
 
 function clearCanvas() {
   pointInfo = [];
+<<<<<<< HEAD
   alert(typeof(img.src)); // debugging; remove later.
   if (typeof(img.src) == string) // if the image is active
   {
@@ -156,6 +157,11 @@ function clearCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
   drawPoints(context);
+=======
+
+  context.fillStyle = "white"; // change later to background image from makebase instead of white
+  context.fillRect(0, 0, canvas.width, canvas.height);
+>>>>>>> parent of 2cd901d... fixed another mirror display glitch
 }
 
 //---------------------- miscellaneous ----------------------
