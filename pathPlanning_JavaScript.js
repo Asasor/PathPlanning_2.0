@@ -59,8 +59,8 @@ function makeBase(e){
       }
     reader.readAsDataURL(e.target.files[0]);
     clearCanvas();
-    setupImage();  // prepare the image
-    refresh();  // refresh to display the image after setupImage.
+    if (!img)
+      {alert("image wasn't uploaded properly; try again.");}
 }
 
 
@@ -276,17 +276,3 @@ function drawRuler(context, fromx, fromy, tox, toy) {
   context.stroke();
 }
 
-
-function setupImage() {
-  if (img)
-  {
-    window.prompt("please enter the length of the longest side of the field im meters.\nthe default is 7.5", "7.5");
-    if (img.height > img.width)
-    {
-    }
-    var imgSizeRatio = img.width / img.height;
-    alert(img.width / canvasWidth);
-  }
-  else
-    {alert("image wasn't uploaded properly; try again.");}
-}
