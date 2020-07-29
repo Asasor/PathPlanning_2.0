@@ -33,7 +33,7 @@ canvas.addEventListener('click', function (evt) { // left click listener
         pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond];
     } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
         rulerCoords.push([mousePos.x, mousePos.y]);
-        refresh(context);
+        refresh();
         drawPoints(context);
         drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
         rulerCoords = [true]; 
@@ -173,7 +173,7 @@ function getMousePos(canvas, evt) {
     };
 }
 
-function refresh(context) {  // a bit like clear canvas but retains information that clear canvas erases
+function refresh() {  // a bit like clear canvas but retains information that clear canvas erases
   if (img)  // check if an image was uploaded
   {
     if (typeof(img.src) === "string") // if the image is active
@@ -190,7 +190,7 @@ function refresh(context) {  // a bit like clear canvas but retains information 
 }
 
 function drawPoints(context) {
-    refresh(context);
+    refresh();
     var start = true;
     var lastPoint = pointInfo[0];  // save the last point at any given time for the arrow's orientation
     context.beginPath();
