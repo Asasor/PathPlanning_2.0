@@ -1,4 +1,3 @@
-
 // use alert() and console.log() to debug
 
 var canvas = document.getElementById('mainCanvas'),
@@ -6,6 +5,8 @@ var canvas = document.getElementById('mainCanvas'),
 
 var imageLoader = document.getElementById('backgroundImage');
 imageLoader.addEventListener('change', makeBase, false);
+
+var infoConsole = document.getElementById("console");
 
 // mode indicators
 var movePointCond = false;
@@ -112,13 +113,13 @@ function mirrorPath() {
   mirrorPointInfo.reverse();
 
   if (mirrorModeState === 1) {
-  for (i = 0; i < mirrorPointInfo.length; i++)  // mirror points vertically
+  for (let i = 0; i < mirrorPointInfo.length; i++)  // mirror points vertically
     {mirrorPointInfo[i][1] += 2 * (parseInt(canvas.height / 2) - mirrorPointInfo[i][1]);}
   } 
       
   else if (mirrorModeState == 2)
   {
-  for (i = 0; i < mirrorPointInfo.length; i++)  // mirror points horizontally
+  for (let i = 0; i < mirrorPointInfo.length; i++)  // mirror points horizontally
     {mirrorPointInfo[i][0] += 2 * (parseInt(canvas.width / 2) - mirrorPointInfo[i][0]);}
   }
   
@@ -132,10 +133,15 @@ function mirrorPath() {
 
 
 function getPathInfo() {
-  var infoConsole = document.getElementById("console");
-  infoConsole.value = "text\n";
-  infoConsole.value += "text\n";
-  infoConsole.value += "text";
+  infoConsole.value = "";  // empty textbox
+  let pathPrintInfo = pathMath(pointInfo,[canvas.width / realWidth, canvas.height / realHeight], 3);
+
+  for (let i = 0; i < pathPrintInfo[0].length - 1; i++)
+  {
+    infoConsole.value += "new double[]{" + pathPrintInfo[0][i].toString() + ", " + pathPrintInfo[1][i].toString() + ", " + pathPrintInfo[2][i].toString() + ", 0.3, 0.7}\n";
+  }
+
+  //alert("working");
 }
 
 
@@ -283,4 +289,68 @@ function drawRuler(context, fromx, fromy, tox, toy) {
   context.lineTo(fromx - headlen * Math.cos(angle - Math.PI / 2), fromy - headlen * Math.sin(angle - Math.PI / 2));
 
   context.stroke();
+}
+
+
+
+
+
+function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathPlanning_infoFunctions.js later
+  let totalInfo = []; //  used for debugging
+  let printInfo = [];
+  let realPointArr = [];
+  let printDistTol = [0];
+  let distanceArr = [0];
+  let angleArr = [0];
+  let angTolArr = [];
+  let distSum = 0;
+  let distance = 0;
+  let angle = 0;
+
+  for (let i = 0; i < canvasPointArr.length; i++) {  // setup real point positions
+    realPointArr.push([canvasPointArr[i][0] / sizeRatios[0], canvasPointArr[i][1] / sizeRatios[1], canvasPointArr[i][2]]);
+  }
+
+  for (let i = 1; i < canvasPointArr.length; i++) {
+    angle = Math.atan2(realPointArr[i][1] - realPointArr[i - 1][1], realPointArr[i][0] - realPointArr[i - 1][0]) * 180 / Math.PI;
+    console.log(Math.atan2(1,1));
+    if (!realPointArr[i][2]) { // check if reversed 
+      angle -= 180;
+      if (Math.abs(angle) > 180)
+        {angle %= 180;}
+    }
+    angleArr.push(Math.round((angle + Number.EPSILON) * Math.pow(10,decimalPlaces)) / Math.pow(10,decimalPlaces));  // add the current angle to the angle array
+  }
+
+  for (let i = 1; i < canvasPointArr.length; i++) {
+    distance = Math.pow(Math.abs(Math.pow(realPointArr[i][0] - realPointArr[i - 1][0], 2) + Math.pow(realPointArr[i][1] - realPointArr[i - 1][1], 2)), 0.5);  // distance between current and last points
+    if (realPointArr[i][2])
+      { distance *= -1; }
+    distSum += distance;  // the sum of all distances up to the current point (- distance traveled in reverse)
+    distanceArr.push(Math.round((distSum + Number.EPSILON) * Math.pow(10,decimalPlaces)) / Math.pow(10,decimalPlaces));  // add the distSum (explained above) to the distance array
+    //the line above was modified from https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
+  }
+
+  
+
+  for (let i = 0; i < canvasPointArr.length; i++)
+    {printDistTol.push(0.3);}
+
+  for (let i = 0; i < canvasPointArr.length; i++)
+  {
+    if (!canvasPointArr[i][2])
+      {angTolArr.push(5);}
+    else
+      {angTolArr.push(10);}
+  }
+
+  totalInfo.push(realPointArr);
+  totalInfo.push(distanceArr);
+  totalInfo.push(angleArr);
+
+  printInfo.push(distanceArr);
+  printInfo.push(angleArr);
+  printInfo.push(printDistTol);
+  printInfo.push(angTolArr);
+  return printInfo;
 }
