@@ -14,8 +14,6 @@ var rulerCoords = [false];  // initiate array to store the coordinates and state
 var mirrorModeState = 0;  // 0 -> none; 1 -> horizontal; 2 -> vertical
 var realWidth = 7.5;  // the real width (in meters) of the field which is represented by the canvas
 var realHeight = 4.0;  // the real height (in meters) of the field which is represented by the canvas
-var canvasWidth = canvas.width;  // save the width of the canvas in case it is changed later
-var canvasHeight = canvas.height;  // save the height of the canvas in case it is changed later
 var canvasSizeRatio = canvas.width / canvas.height;
 var img;
 
@@ -59,6 +57,14 @@ function makeBase(e){
       }
     reader.readAsDataURL(e.target.files[0]);
     clearCanvas();
+    
+    if (img.width > img.height) {  // optimize (for smaller code) later
+      realWidth = parseFloat(prompt("please enter the length of the longest side of the field in meters\nthe default is 7.5", "7.5"));
+      realHeight = realWidth * img.width / img.height;
+    } else {
+      realHeight = parseFloat(prompt("please enter the length of the longest side of the field in meters\nthe default is 7.5", "7.5"));
+    }
+
     if (!img)
       {alert("image wasn't uploaded properly; try again.");}
 }
@@ -125,8 +131,11 @@ function mirrorPath() {
 }
 
 
-function GetPathInfo() {
-  
+function getPathInfo() {
+  var infoConsole = document.getElementById("console");
+  infoConsole.value = "text\n";
+  infoConsole.value += "text\n";
+  infoConsole.value += "text";
 }
 
 
@@ -275,4 +284,3 @@ function drawRuler(context, fromx, fromy, tox, toy) {
 
   context.stroke();
 }
-
