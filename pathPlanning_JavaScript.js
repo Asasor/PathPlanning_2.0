@@ -14,6 +14,9 @@ var rulerCoords = [false];  // initiate array to store the coordinates and state
 var mirrorModeState = 0;  // 0 -> none; 1 -> horizontal; 2 -> vertical
 var realWidth = 7.5;  // the real width (in meters) of the field which is represented by the canvas
 var realHeight = 4.0;  // the real height (in meters) of the field which is represented by the canvas
+var canvasWidth = canvas.width;  // save the width of the canvas in case it is changed later
+var canvasHeight = canvas.height;  // save the height of the canvas in case it is changed later
+var canvasSizeRatio = canvas.width / canvas.height;
 var img;
 
 var pointInfo = [];
@@ -42,20 +45,22 @@ canvas.addEventListener('click', function (evt) { // left click listener
 
 //---------------------- buttons ----------------------
 
-// taken from http://jsfiddle.net/influenztial/qy7h5/
+// modified from http://jsfiddle.net/influenztial/qy7h5/
 function makeBase(e){ 
     var reader = new FileReader();
     reader.onload = function(event){
         img = new Image();
         img.onload = function() {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            context.drawImage(img, 0, 0);
+          var heightRatio = Math.round(canvasWidth / img.width);
+          canvas.height = img.height * heightRatio;
+          context.drawImage(img, 0, 0, canvas.width, canvas.height);
       }
       img.src = event.target.result;
       }
     reader.readAsDataURL(e.target.files[0]);
     clearCanvas();
+    setupImage();  // prepare the image
+    refresh();  // refresh to display the image after setupImage.
 }
 
 
@@ -63,16 +68,16 @@ function makeBase(e){
 function deletePoint() {
     pointInfo.pop();
 
-    context.fillStyle = "white"; // change later to background image from makebase instead of white
+    context.fillStyle = "white";  // change later to background image from makebase instead of white
     context.fillRect(0, 0, canvas.width, canvas.height);
 
     drawPoints(context);
 }
 
 
-function movePoint(Btn) { // not finished; need to implement moving point
-  movePointCond ^= 1; // flip bool
-  if (movePointCond) { Btn.style.backgroundColor = 'gray'; } else { Btn.style.backgroundColor = ''; } // reset to default colour
+function movePoint(Btn) {  // not finished; need to implement moving point
+  movePointCond ^= 1;  // flip bool
+  if (movePointCond) { Btn.style.backgroundColor = 'gray'; } else { Btn.style.backgroundColor = ''; }  // reset to default colour
 }
 
 function rulerMode(Btn) {
@@ -86,11 +91,11 @@ function rulerMode(Btn) {
 }
 
 function mirrorMode(Btn) {
-    mirrorModeState = (mirrorModeState + 1) % 3; // advance mirror mode to next state
+    mirrorModeState = (mirrorModeState + 1) % 3;  // advance mirror mode to next state
     if (mirrorModeState === 1) { Btn.style.backgroundColor = 'lightgray'; } // horizontal mirror mode
   else if (mirrorModeState === 2)
-    { Btn.style.backgroundColor = 'gray'; } // vertical mirror mode
-        else {Btn.style.backgroundColor = ''; } // reset to default colour
+    { Btn.style.backgroundColor = 'gray'; }  // vertical mirror mode
+        else {Btn.style.backgroundColor = ''; }  // reset to default colour
 
   drawPoints(context);
 }
@@ -131,34 +136,31 @@ function setSegment() {
 
 
 function reverseMode(Btn) {
-  reverseCond ^= 1; // flip bool
+  reverseCond ^= 1;  // flip bool
   if (reverseCond)
     { Btn.style.backgroundColor="gray"; }
   else
-    { Btn.style.backgroundColor=''; } // reset to default colour
+    { Btn.style.backgroundColor=''; }  // reset to default colour
 }
 
 
 function clearCanvas() {
   pointInfo = [];
 
-  alert(typeof(img.src)); // debugging; remove later.
-  if (typeof(img.src) == string) // if the image is active
+  if (img)  // check if an image was uploaded
   {
-    canvas.width = img.width;
-    canvas.height = img.height;
-     context.drawImage(img,0,0);
+    if (typeof(img.src) === "string")  // if the image is active
+    {
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+    }
   }
   
-  else // otherwise (if the image is not active) 
+  else  // if the image is not active
   {
-    context.fillStyle = "white"; // change later to background image from makebase instead of white
+    context.fillStyle = "white";  // change later to background image from makebase instead of white
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
   drawPoints(context);
-
-  context.fillStyle = "white"; // change later to background image from makebase instead of white
-  context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 //---------------------- miscellaneous ----------------------
@@ -171,35 +173,32 @@ function getMousePos(canvas, evt) {
     };
 }
 
-function refresh(context) { // a bit like clear canvas but retains information that clear canvas erases
-  if (img) // check if a background was uploaded
+function refresh(context) {  // a bit like clear canvas but retains information that clear canvas erases
+  if (img)  // check if an image was uploaded
   {
     if (typeof(img.src) === "string") // if the image is active
     {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      context.drawImage(img,0,0);
+      context.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
   }
       
-  else // otherwise (if the image is not active) 
+  else  // if the image is not active
   {
-    context.fillStyle = "white"; // change later to background image from makebase instead of white
+    context.fillStyle = "white";  // change later to background image from makebase instead of white
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
 }
 
 function drawPoints(context) {
-    // alert("working");
-    refresh(context); // not working
+    refresh(context);
     var start = true;
-    var lastPoint = pointInfo[0]; // save the last point at any given time for the arrow's orientation
+    var lastPoint = pointInfo[0];  // save the last point at any given time for the arrow's orientation
     context.beginPath();
     
     pointInfo.forEach((element) => {
         if (!start)
         {
-        if (!element[2]) // check if reverse mode is toggled
+        if (!element[2])  // check if reverse mode is toggled
           { arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
         else
           { arrowToReverse(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
@@ -231,7 +230,7 @@ function drawMirror(context, width, height) {
 
 //  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
 function arrowTo(context, fromx, fromy, tox, toy) {
-  var headlen = 15; // length of head in pixels
+  var headlen = 15;  // length of head in pixels
   var dx = tox - fromx;
   var dy = toy - fromy;
   var angle = Math.atan2(dy, dx);
@@ -243,7 +242,7 @@ function arrowTo(context, fromx, fromy, tox, toy) {
 }
 
 function arrowToReverse(context, fromx, fromy, tox, toy) {
-  var headlen = 15; // length of head in pixels
+  var headlen = 15;  // length of head in pixels
   var dx = fromx - tox;
   var dy = fromy - toy;
   var angle = Math.atan2(dy, dx);
@@ -257,7 +256,7 @@ function arrowToReverse(context, fromx, fromy, tox, toy) {
 function drawRuler(context, fromx, fromy, tox, toy) {
   context.beginPath();
 
-  var headlen = 15; // length of head in pixels
+  var headlen = 15;  // length of head in pixels
   var dx = fromx - tox;
   var dy = fromy - toy;
   var angle = Math.atan2(dy, dx);
@@ -275,4 +274,19 @@ function drawRuler(context, fromx, fromy, tox, toy) {
   context.lineTo(fromx - headlen * Math.cos(angle - Math.PI / 2), fromy - headlen * Math.sin(angle - Math.PI / 2));
 
   context.stroke();
+}
+
+
+function setupImage() {
+  if (img)
+  {
+    window.prompt("please enter the length of the longest side of the field im meters.\nthe default is 7.5", "7.5");
+    if (img.height > img.width)
+    {
+    }
+    var imgSizeRatio = img.width / img.height;
+    alert(img.width / canvasWidth);
+  }
+  else
+    {alert("image wasn't uploaded properly; try again.");}
 }
