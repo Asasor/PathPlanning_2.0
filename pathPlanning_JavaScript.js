@@ -20,6 +20,8 @@ var img;
 
 var pointInfo = [];
 
+refresh(); // start off by initializing various screen elements such as the grid using the refresh function
+
 
 //---------------------- canvas interaction ----------------------
 canvas.addEventListener('click', function (evt) { // left click listener
@@ -32,8 +34,6 @@ canvas.addEventListener('click', function (evt) { // left click listener
         pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond];
     } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
         rulerCoords.push([mousePos.x, mousePos.y]);
-        refresh();
-        drawPoints(context);
         drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
         rulerCoords = [true]; 
     }
@@ -161,24 +161,11 @@ function reverseMode(Btn) {
 
 function clearCanvas() {
   pointInfo = [];
-
-  if (img)  // check if an image was uploaded
-  {
-    if (typeof(img.src) === "string")  // if the image is active
-    {
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
-    }
-  }
-  
-  else  // if the image is not active
-  {
-    context.fillStyle = "white";  // change later to background image from makebase instead of white
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  }
-  drawPoints(context);
+  refresh();
 }
 
 //---------------------- miscellaneous ----------------------
+
 
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -188,7 +175,9 @@ function getMousePos(canvas, evt) {
     };
 }
 
+
 function refresh() {  // a bit like clear canvas but retains information that clear canvas erases
+  console.log("refresh");
   if (img)  // check if an image was uploaded
   {
     if (typeof(img.src) === "string") // if the image is active
@@ -202,7 +191,11 @@ function refresh() {  // a bit like clear canvas but retains information that cl
     context.fillStyle = "white";  // change later to background image from makebase instead of white
     context.fillRect(0, 0, canvas.width, canvas.height);
   }
+
+  drawMirror(context, canvas.width, canvas.height);  // draw mirror
+  drawGrid(0.5,0.5); // units in m (proportional to realWidth and realHeight)
 }
+
 
 function drawPoints(context) {
     refresh();
@@ -227,6 +220,7 @@ function drawPoints(context) {
     drawMirror(context, canvas.width, canvas.height);  // draw mirror
 }
 
+
 function drawMirror(context, width, height) {
 
     context.beginPath();
@@ -243,6 +237,7 @@ function drawMirror(context, width, height) {
     context.stroke();
 }
 
+
 //  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
 function arrowTo(context, fromx, fromy, tox, toy) {
   var headlen = 15;  // length of head in pixels
@@ -256,6 +251,7 @@ function arrowTo(context, fromx, fromy, tox, toy) {
   context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
 }
 
+
 function arrowToReverse(context, fromx, fromy, tox, toy) {
   var headlen = 15;  // length of head in pixels
   var dx = fromx - tox;
@@ -267,6 +263,7 @@ function arrowToReverse(context, fromx, fromy, tox, toy) {
   context.moveTo(tox, toy);
   context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
 }
+
 
 function drawRuler(context, fromx, fromy, tox, toy) {
   context.beginPath();
@@ -290,9 +287,6 @@ function drawRuler(context, fromx, fromy, tox, toy) {
 
   context.stroke();
 }
-
-
-
 
 
 function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathPlanning_infoFunctions.js later
@@ -353,4 +347,24 @@ function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathP
   printInfo.push(printDistTol);
   printInfo.push(angTolArr);
   return printInfo;
+}
+
+
+function drawGrid(realCellWidth, realCellHeight) {
+  let cellWidth = Math.round(realCellWidth * canvas.width / realWidth);
+  let cellHeight = Math.round(realCellHeight * canvas.height / realHeight);
+
+  context.beginPath();
+
+  for (let y = 0;  y <= canvas.width; y += cellHeight) {  // draw all horizontal lines
+    context.moveTo(0, y);
+    context.lineTo(canvas.width, y);
+  }
+
+  for (let x = 0; x <= canvas.width; x += cellWidth) {  // draw all vertical lines
+    context.moveTo(x, 0);
+    context.lineTo(x, canvas.height);
+  }
+
+  context.stroke();
 }
