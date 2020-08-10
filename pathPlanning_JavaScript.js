@@ -8,9 +8,12 @@ imageLoader.addEventListener('change', makeBase, false);
 
 var infoConsole = document.getElementById("console");
 
+var pressTimer; // use a timer to track the length of long clicks
+
 // mode indicators
-var movePointCond = false;
-var reverseCond = false;
+var movePointCond = false;  // check if movePointCond is true (use to toggle between drawing and moving points)
+var bezierMode = false; // mode that switches between drawing regular and bezier lines
+var reverseCond = false;  // save the current reverse state; it is either on (true) or off (false)
 var rulerCoords = [false];  // initiate array to store the coordinates and state of the ruler
 var mirrorModeState = 0;  // 0 -> none; 1 -> horizontal; 2 -> vertical
 var realWidth = 7.5;  // the real width (in meters) of the field which is represented by the canvas
@@ -18,16 +21,24 @@ var realHeight = 4.0;  // the real height (in meters) of the field which is repr
 var canvasSizeRatio = canvas.width / canvas.height;
 var img;
 
-var pointInfo = [];
+var pointInfo = [];  // array which contains all the regular points' coordinates
+var bezierInfo = [];  // array which contains all of the bezier information
 
 refresh(); // start off by initializing various screen elements such as the grid using the refresh function
 
 
 //---------------------- canvas interaction ----------------------
-canvas.addEventListener('click', function (evt) { // left click listener
+canvas.addEventListener('click', function (evt) {  // click listener (used to draw regular points)
     
-    var mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
-    
+  let mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
+  if (bezierMode) { // check whether bezierMode is active or not
+    bezierInfo[bezierInfo.length - 1][1][0].push([mousePos.x, mousePos.y, reverseCond]);
+
+    refresh();
+    drawPointCircles(context, pointInfo, 8, "green");  // draw the regular points
+    for (let p = 0; p < bezierInfo.length; p++) 
+    { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
+  } else {
     if (rulerCoords[0] === false) { // check whether a regular point or a ruler should be drawn
         // add a regular point
         pointInfo.push([]);
@@ -39,8 +50,46 @@ canvas.addEventListener('click', function (evt) { // left click listener
     }
     
     drawPoints(context);
+  }
 }, false
 );
+
+
+canvas.addEventListener('mousedown', function (evt) {  // long mouse press listener (used to draw curves)
+  pressTimer = window.setTimeout(function() { // var to change the points' state (regular and curve)
+
+  // on the first bezier mouse press you only change the mode to be bezierMode and add an 
+  // empty dictionary to store the bezier's information
+  if (!bezierMode) {  
+    bezierMode = true;
+    bezierInfo.push([
+      pointInfo.length - 1,  // save the position of the bezier curve in the path
+      [[pointInfo[pointInfo.length - 1]], []]  // for every bezier curve, there are two types of points: control points and path points 
+    ]);
+    alert("starting to draw a new bezier curve");
+  }
+
+  // after the second click, every bezier mouse press adds a new bezier point
+  else {
+    bezierMode = false;
+    alert("going back to the regular drawing mode");
+  }
+
+  refresh();
+  drawPointCircles(context, pointInfo, 8, "green");  // at the end of the function, draw the points
+  for (let p = 0; p < bezierInfo.length; p++) 
+  { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
+  }, 200  // time (in ms) to wait until function is triggered
+  );
+}, false
+);
+
+
+canvas.addEventListener('mouseup', function (evt) {  // stop mousedown alert if the mouse is lifted
+  clearTimeout(pressTimer);  // clear long press timer
+}, false
+);
+
 
 //---------------------- buttons ----------------------
 
@@ -159,7 +208,8 @@ function reverseMode(Btn) {
 }
 
 
-function clearCanvas() {
+function clearCanvas() {  // reset all of the point information and refresh
+  bezierInfo = [];
   pointInfo = [];
   refresh();
 }
@@ -367,4 +417,56 @@ function drawGrid(realCellWidth, realCellHeight) {
   }
 
   context.stroke();
+}
+
+
+function drawPointCircles(context, pList, rad, pColor) {  // pColor -> point color
+  for (let i = 0; i < pList.length; i++) {
+    context.fillStyle = pColor; // change the color based on whether the point is a curve point
+    context.beginPath();
+    context.arc(pList[i][0], pList[i][1], rad, 0, 2 * Math.PI, false);
+    context.fill();
+    context.stroke();
+  }
+}
+
+
+function UniformBezierDistributionMath(acc, pList, segLen) {
+  let pDist = 0;
+  let diff = 0;
+  let pL = 0;
+  let lpL = bezier(0, pList);  // lpL --> last point Location
+  let outList = []
+
+  for (let i = 1 / acc; i <= 1 + 1 / acc; i += 1 / acc) {  // acc --> accuracy
+      pL = bezier(i, pList);
+      pDist = dist(lpL.x, lpL.y, pL.x, pL.y);
+      diff = Math.abs(pDist - segLen);
+      if (diff % segLen < 50) {
+          outList.push(pL);
+
+          pDist = 0;
+          lpL = pL;
+      }
+  }
+}
+
+
+// taken from http://rosettacode.org/wiki/Evaluate_binomial_coefficients#JavaScript
+function binom(n, k) {
+  var coeff = 1;
+  for (var i = n - k + 1; i <= n; i++) coeff *= i;
+  for (var i = 1; i <= k; i++) coeff /= i;
+  return coeff;
+}
+
+
+function dist(x1, y1, x2, y2) {
+  return Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2);
+}
+
+
+// taken from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
+function sleep(ms) {  // not currently used
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
