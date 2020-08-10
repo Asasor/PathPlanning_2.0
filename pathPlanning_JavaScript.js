@@ -20,6 +20,7 @@ var realWidth = 7.5;  // the real width (in meters) of the field which is repres
 var realHeight = 4.0;  // the real height (in meters) of the field which is represented by the canvas
 var canvasSizeRatio = canvas.width / canvas.height;
 var img;
+var tempBezierPoints = [];  // array to store temporary bezier point information
 
 var pointInfo = [];  // array which contains all the regular points' coordinates
 var bezierInfo = [];  // array which contains all of the bezier information
@@ -33,11 +34,15 @@ canvas.addEventListener('click', function (evt) {  // click listener (used to dr
   let mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
   if (bezierMode) { // check whether bezierMode is active or not
     bezierInfo[bezierInfo.length - 1][1][0].push([mousePos.x, mousePos.y, reverseCond]);
+    tempBezierPoints = UniformBezierDistributionMath(100, bezierInfo[bezierInfo.length - 1][1][0], 8);
+    console.log(tempBezierPoints);
 
     refresh();
     drawPointCircles(context, pointInfo, 8, "green");  // draw the regular points
     for (let p = 0; p < bezierInfo.length; p++) 
     { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
+    drawPointCircles(context, tempBezierPoints, 8, "blue");
+
   } else {
     if (rulerCoords[0] === false) { // check whether a regular point or a ruler should be drawn
         // add a regular point
@@ -67,18 +72,20 @@ canvas.addEventListener('mousedown', function (evt) {  // long mouse press liste
       [[pointInfo[pointInfo.length - 1]], []]  // for every bezier curve, there are two types of points: control points and path points 
     ]);
     alert("starting to draw a new bezier curve");
+
+    refresh();
+    drawPointCircles(context, pointInfo, 8, "green");  // at the end of the function, draw the points
+    for (let p = 0; p < bezierInfo.length; p++) 
+    { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
   }
 
-  // after the second click, every bezier mouse press adds a new bezier point
   else {
+    tempBezierPoints = UniformBezierDistributionMath(100, bezierInfo[bezierInfo.length - 1][1][0], 8);
     bezierMode = false;
     alert("going back to the regular drawing mode");
-  }
 
-  refresh();
-  drawPointCircles(context, pointInfo, 8, "green");  // at the end of the function, draw the points
-  for (let p = 0; p < bezierInfo.length; p++) 
-  { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
+    drawPoints(context);
+  }
   }, 200  // time (in ms) to wait until function is triggered
   );
 }, false
@@ -123,10 +130,6 @@ function makeBase(e){
 
 function deletePoint() {
     pointInfo.pop();
-
-    context.fillStyle = "white";  // change later to background image from makebase instead of white
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
     drawPoints(context);
 }
 
@@ -431,6 +434,23 @@ function drawPointCircles(context, pList, rad, pColor) {  // pColor -> point col
 }
 
 
+// modified from https://stackoverflow.com/questions/31167663/how-to-code-an-nth-order-bezier-curve
+function bezier(t, plist) {
+  var order = plist.length - 1;
+
+  var y = 0;
+  var x = 0;
+
+  for (i = 0; i <= order; i++) {
+      x = x + (binom(order, i) * Math.pow((1 - t), (order - i)) * Math.pow(t, i) * (plist[i][0]));
+      y = y + (binom(order, i) * Math.pow((1 - t), (order - i)) * Math.pow(t, i) * (plist[i][1]));
+  }
+
+  return {x: x, y: y};
+}
+
+
+// taken from my research project -> https://github.com/Asasor/javascriptUniformSegmentLengthBezier
 function UniformBezierDistributionMath(acc, pList, segLen) {
   let pDist = 0;
   let diff = 0;
@@ -443,12 +463,14 @@ function UniformBezierDistributionMath(acc, pList, segLen) {
       pDist = dist(lpL.x, lpL.y, pL.x, pL.y);
       diff = Math.abs(pDist - segLen);
       if (diff % segLen < 50) {
-          outList.push(pL);
+          outList.push([pL.x, pL.y]);
 
           pDist = 0;
           lpL = pL;
       }
   }
+
+  return outList;
 }
 
 
