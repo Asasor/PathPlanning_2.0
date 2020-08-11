@@ -509,12 +509,12 @@ function makeBezierArrays(pList) {  // first and last points can't be control po
       {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("1");}
     
     if (i > 0) {
-      if (pList[i - 1][2] && !pList[i][2])
+      if (pList[i - 1][2] && !pList[i][3])
         {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("2");}
     }
     
     if (i < pList.length - 1) {
-      if (pList[i + 1][2] && !pList[i][2])
+      if (pList[i + 1][2] && !pList[i][3])
         {arrOfArrs.push([pList[i]]); alert("3");}
     }
   }
