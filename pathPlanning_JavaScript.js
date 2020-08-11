@@ -237,6 +237,13 @@ function drawPoints(context) {
     drawPointCircles(context, pointInfo, 8, "green", "red");
     drawArrows(context, pointInfo);
     drawMirror(context, canvas.width, canvas.height);  // draw mirror
+
+    var bezierArrs = makeBezierArrays(pointInfo);
+    var bezierInfo = [];
+    for (var i = 0; i < bezierArrs.length; i++) {
+      bezierInfo = UniformBezierDistributionMath(1000, bezierArrs[i], 100);
+      simplifiedDrawPointCircles(context, bezierInfo, 8, "blue");
+    }
 }
 
 
@@ -406,6 +413,17 @@ function drawPointCircles(context, pList, rad, nColor, bColor) {  // nColor -> n
 }
 
 
+function simplifiedDrawPointCircles(context, pList, rad, color) {  // only 1 color
+  for (let i = 0; i < pList.length; i++) {
+    context.fillStyle = color; // change the color based on whether the point is a curve point
+    context.beginPath();
+    context.arc(pList[i][0], pList[i][1], rad, 0, 2 * Math.PI, false);
+    context.fill();
+    context.stroke();
+  }
+}
+
+
 // modified from https://stackoverflow.com/questions/31167663/how-to-code-an-nth-order-bezier-curve
 function bezier(t, plist) {
   var order = plist.length - 1;
@@ -505,17 +523,17 @@ function drawArrows(context, pArr) {
 function makeBezierArrays(pList) {  // first and last points can't be control points
   var arrOfArrs = [];
   for (var i = 0; i < pList.length; i++) {
-    if (pList[i][2])
-      {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("1");}
+    if (pList[i][3])
+      {arrOfArrs[arrOfArrs.length - 1].push(pList[i]);}
     
     if (i > 0) {
-      if (pList[i - 1][2] && !pList[i][3])
-        {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("2");}
+      if (pList[i - 1][3] && !pList[i][3])
+        {arrOfArrs[arrOfArrs.length - 1].push(pList[i]);}
     }
     
     if (i < pList.length - 1) {
-      if (pList[i + 1][2] && !pList[i][3])
-        {arrOfArrs.push([pList[i]]); alert("3");}
+      if (pList[i + 1][3] && !pList[i][3])
+        {arrOfArrs.push([pList[i]]);}
     }
   }
   return arrOfArrs;
