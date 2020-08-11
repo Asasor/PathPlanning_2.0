@@ -30,62 +30,46 @@ refresh(); // start off by initializing various screen elements such as the grid
 
 //---------------------- canvas interaction ----------------------
 canvas.addEventListener('click', function (evt) {  // click listener (used to draw regular points)
-    
   let mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
-  if (bezierMode) { // check whether bezierMode is active or not
-    bezierInfo[bezierInfo.length - 1][1][0].push([mousePos.x, mousePos.y, reverseCond]);
-    tempBezierPoints = UniformBezierDistributionMath(100, bezierInfo[bezierInfo.length - 1][1][0], 8);
-    console.log(tempBezierPoints);
-
-    refresh();
-    drawPointCircles(context, pointInfo, 8, "green");  // draw the regular points
-    for (let p = 0; p < bezierInfo.length; p++) 
-    { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
-    drawPointCircles(context, tempBezierPoints, 8, "blue");
-
-  } else {
-    if (rulerCoords[0] === false) { // check whether a regular point or a ruler should be drawn
-        // add a regular point
-        pointInfo.push([]);
-        pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond];
-    } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
-        rulerCoords.push([mousePos.x, mousePos.y]);
-        drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
-        rulerCoords = [true]; 
+    if (bezierMode) 
+      { bezierMode = false; }
+    else {
+      if (rulerCoords[0] === false) { // check whether a regular point or a ruler should be drawn
+          // add a regular point
+          pointInfo.push([]);
+          pointInfo[pointInfo.length - 1] = [mousePos.x, mousePos.y, reverseCond, false];
+      } else if (rulerCoords.length < 3) { // check if the ruler is active and there are a at most two points  
+          rulerCoords.push([mousePos.x, mousePos.y]);
+          drawRuler(context, rulerCoords[1][0], rulerCoords[1][1], rulerCoords[2][0], rulerCoords[2][1]);
+          rulerCoords = [true]; 
+      }
     }
-    
-    drawPoints(context);
-  }
+
+  drawPoints(context);
 }, false
 );
 
 
 canvas.addEventListener('mousedown', function (evt) {  // long mouse press listener (used to draw curves)
   pressTimer = window.setTimeout(function() { // var to change the points' state (regular and curve)
+  let mousePos = getMousePos(canvas, evt);  // get the coordinates of the mouse
 
   // on the first bezier mouse press you only change the mode to be bezierMode and add an 
   // empty dictionary to store the bezier's information
-  if (!bezierMode) {  
-    bezierMode = true;
+  if (true) {  
     bezierInfo.push([
       pointInfo.length - 1,  // save the position of the bezier curve in the path
       [[pointInfo[pointInfo.length - 1]], []]  // for every bezier curve, there are two types of points: control points and path points 
     ]);
-    alert("starting to draw a new bezier curve");
 
     refresh();
-    drawPointCircles(context, pointInfo, 8, "green");  // at the end of the function, draw the points
-    for (let p = 0; p < bezierInfo.length; p++) 
-    { drawPointCircles(context, bezierInfo[p][1][0], 8, "red"); }  // draw the bezier points
+    cP = findClosestPoint(pointInfo.slice(1, -1), [mousePos.x, mousePos.y]);  // cP --> closest Point (not start point or end point)
+    cP[0] += 1; // move position 1 forward to deal with place distortion
+    bezierMode = true;
+    pointInfo[cP[0]][3]  ^= 1; // flip bcp (Bezier Control Point) state of point
   }
 
-  else {
-    tempBezierPoints = UniformBezierDistributionMath(100, bezierInfo[bezierInfo.length - 1][1][0], 8);
-    bezierMode = false;
-    alert("going back to the regular drawing mode");
-
-    drawPoints(context);
-  }
+  drawPoints(context);
   }, 200  // time (in ms) to wait until function is triggered
   );
 }, false
@@ -230,46 +214,28 @@ function getMousePos(canvas, evt) {
 
 
 function refresh() {  // a bit like clear canvas but retains information that clear canvas erases
-  console.log("refresh");
+  //console.log("refresh");
   if (img)  // check if an image was uploaded
   {
     if (typeof(img.src) === "string") // if the image is active
+    { context.drawImage(img, 0, 0, canvas.width, canvas.height); }
+  }
+        
+    else  // if the image is not active
     {
-      context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      context.fillStyle = "white";  // change later to background image from makebase instead of white
+      context.fillRect(0, 0, canvas.width, canvas.height);
     }
-  }
-      
-  else  // if the image is not active
-  {
-    context.fillStyle = "white";  // change later to background image from makebase instead of white
-    context.fillRect(0, 0, canvas.width, canvas.height);
-  }
 
-  drawMirror(context, canvas.width, canvas.height);  // draw mirror
-  drawGrid(0.5,0.5); // units in m (proportional to realWidth and realHeight)
+    drawMirror(context, canvas.width, canvas.height);  // draw mirror
+    drawGrid(0.5,0.5); // units in m (proportional to realWidth and realHeight)
 }
 
 
 function drawPoints(context) {
     refresh();
-    var start = true;
-    var lastPoint = pointInfo[0];  // save the last point at any given time for the arrow's orientation
-    context.beginPath();
-    
-    pointInfo.forEach((element) => {
-        if (!start)
-        {
-        if (!element[2])  // check if reverse mode is toggled
-          { arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
-        else
-          { arrowToReverse(context,lastPoint[0],lastPoint[1],element[0],element[1]); }
-        }
-        lastPoint = element;
-        start = false;
-    })
-    
-    context.stroke();
-
+    drawPointCircles(context, pointInfo, 8, "green", "red");
+    drawArrows(context, pointInfo);
     drawMirror(context, canvas.width, canvas.height);  // draw mirror
 }
 
@@ -291,12 +257,14 @@ function drawMirror(context, width, height) {
 }
 
 
-//  taken from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
-function arrowTo(context, fromx, fromy, tox, toy) {
+//  modified from https://stackoverflow.com/questions/808826/draw-arrow-on-canvas-tag
+function arrowTo(context, fromx, fromy, tox, toy, color) {
   var headlen = 15;  // length of head in pixels
   var dx = tox - fromx;
   var dy = toy - fromy;
   var angle = Math.atan2(dy, dx);
+  context.lineWidth = 2;
+  context.strokeStyle = color;
   context.moveTo(fromx, fromy);
   context.lineTo(tox, toy);
   context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
@@ -305,11 +273,13 @@ function arrowTo(context, fromx, fromy, tox, toy) {
 }
 
 
-function arrowToReverse(context, fromx, fromy, tox, toy) {
+function arrowToReverse(context, fromx, fromy, tox, toy, color) {
   var headlen = 15;  // length of head in pixels
   var dx = fromx - tox;
   var dy = fromy - toy;
   var angle = Math.atan2(dy, dx);
+  context.linewidth = 2;
+  context.strokeStyle = color;
   context.moveTo(fromx, fromy);
   context.lineTo(tox, toy);
   context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
@@ -408,7 +378,9 @@ function drawGrid(realCellWidth, realCellHeight) {
   let cellHeight = Math.round(realCellHeight * canvas.height / realHeight);
 
   context.beginPath();
-
+  context.lineWidth = 1;
+  context.strokeStyle = "black";
+  
   for (let y = 0;  y <= canvas.width; y += cellHeight) {  // draw all horizontal lines
     context.moveTo(0, y);
     context.lineTo(canvas.width, y);
@@ -423,9 +395,9 @@ function drawGrid(realCellWidth, realCellHeight) {
 }
 
 
-function drawPointCircles(context, pList, rad, pColor) {  // pColor -> point color
+function drawPointCircles(context, pList, rad, nColor, bColor) {  // nColor -> normal color; bColor -> bezier color
   for (let i = 0; i < pList.length; i++) {
-    context.fillStyle = pColor; // change the color based on whether the point is a curve point
+    context.fillStyle = pList[i][3] ? nColor : bColor; // change the color based on whether the point is a curve point
     context.beginPath();
     context.arc(pList[i][0], pList[i][1], rad, 0, 2 * Math.PI, false);
     context.fill();
@@ -484,11 +456,67 @@ function binom(n, k) {
 
 
 function dist(x1, y1, x2, y2) {
-  return Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2);
+  return Math.pow(Math.pow(Math.abs(x1 - x2), 2) + Math.pow(Math.abs(y1 - y2), 2), 0.5);
 }
 
 
 // taken from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
-function sleep(ms) {  // not currently used
+function sleep(ms) {  // not currently used; will be used later to make application look nicer
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function findClosestPoint(pList, pCompare) {  // find the closest point to pCompare from pList and return its' index and distance from pCompare
+  let compareDist = dist(pList[0][0], pList[0][1], pCompare[0], pCompare[1]);
+  let minP_Info = [0, compareDist];
+  for (let i = 1; i < pList.length; i++) {  // start at 1 because 0 is the initial state
+    compareDist = dist(pList[i][0], pList[i][1], pCompare[0], pCompare[1]);
+    if (minP_Info[1] >= compareDist)
+      { minP_Info = [i, compareDist]; }
+  }
+
+  return minP_Info;
+}
+
+
+function drawArrows(context, pArr) {
+  var color = "green";
+  var start = true;
+  var lastPoint = pointInfo[0];  // save the last point at any given time for the arrow's orientation
+    
+  pArr.forEach(function iterate(element, index) {
+      if (!start) {
+        context.beginPath();
+        if (element[3] || pArr[index - 1][3])  // check if either the current point or the next point are bezier points
+          { color = "green"; } else { color = "red"; } // doesnt work; fix later
+
+        if (!element[2])  // check if reverse mode is toggled
+        { arrowTo(context,lastPoint[0],lastPoint[1],element[0],element[1], color); } 
+        else
+        { arrowToReverse(context,lastPoint[0],lastPoint[1],element[0],element[1], color); }
+        context.stroke();
+      }
+      lastPoint = element;
+      start = false;
+  })
+}
+
+
+function makeBezierArrays(pList) {  // first and last points can't be control points
+  var arrOfArrs = [];
+  for (var i = 0; i < pList.length; i++) {
+    if (pList[i][2])
+      {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("1");}
+    
+    if (i > 0) {
+      if (pList[i - 1][2] && !pList[i][2])
+        {arrOfArrs[arrOfArrs.length - 1].push(pList[i]); alert("2");}
+    }
+    
+    if (i < pList.length - 1) {
+      if (pList[i + 1][2] && !pList[i][2])
+        {arrOfArrs.push([pList[i]]); alert("3");}
+    }
+  }
+  return arrOfArrs;
 }
