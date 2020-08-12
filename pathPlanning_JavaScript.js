@@ -174,10 +174,8 @@ function getPathInfo() {
 
   for (let i = 0; i < pathPrintInfo[0].length - 1; i++)
   {
-    infoConsole.value += "new double[]{" + pathPrintInfo[0][i].toString() + ", " + pathPrintInfo[1][i].toString() + ", " + pathPrintInfo[2][i].toString() + pathPrintInfo[3][i] ? "10" : "5" + ", 0.3, 0.7}\n";
+    infoConsole.value += "new double[]{" + pathPrintInfo[0][i].toString() + ", " + pathPrintInfo[1][i].toString() + ", " + pathPrintInfo[2][i].toString() + ", " + pathPrintInfo[3][i] + ", 0.3, 0.7}\n";
   }
-
-  //alert("working");
 }
 
 
