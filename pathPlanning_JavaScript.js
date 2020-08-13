@@ -330,10 +330,16 @@ function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathP
   let angle = 0;
 
   for (let i = 0; i < canvasPointArr.length; i++) {  // setup real point positions
-    realPointArr.push([canvasPointArr[i][0] / sizeRatios[0], canvasPointArr[i][1] / sizeRatios[1], canvasPointArr[i][2]]);
+    if (!canvasPointArr[i][3])
+      { realPointArr.push([canvasPointArr[i][0] / sizeRatios[0], canvasPointArr[i][1] / sizeRatios[1], canvasPointArr[i][2], false]); }
+    else if (!canvasPointArr[i + 1][3]) {
+      console.log(realPointArr);
+      realPointArr.push.apply(realPointArr, computeBezier(canvasPointArr, i, sizeRatios));
+      console.log(realPointArr);
+    }
   }
 
-  for (let i = 1; i < canvasPointArr.length; i++) {
+  for (let i = 1; i < realPointArr.length; i++) {
     angle = Math.atan2(realPointArr[i][1] - realPointArr[i - 1][1], realPointArr[i][0] - realPointArr[i - 1][0]) * 180 / Math.PI;
     console.log(Math.atan2(1,1));
     if (!realPointArr[i][2]) { // check if reversed 
@@ -344,7 +350,7 @@ function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathP
     angleArr.push(Math.round((angle + Number.EPSILON) * Math.pow(10,decimalPlaces)) / Math.pow(10,decimalPlaces));  // add the current angle to the angle array
   }
 
-  for (let i = 1; i < canvasPointArr.length; i++) {
+  for (let i = 1; i < realPointArr.length; i++) {
     distance = Math.pow(Math.abs(Math.pow(realPointArr[i][0] - realPointArr[i - 1][0], 2) + Math.pow(realPointArr[i][1] - realPointArr[i - 1][1], 2)), 0.5);  // distance between current and last points
     if (realPointArr[i][2])
       { distance *= -1; }
@@ -355,12 +361,12 @@ function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathP
 
   
 
-  for (let i = 0; i < canvasPointArr.length; i++)
+  for (let i = 0; i < realPointArr.length; i++)
     {printDistTol.push(0.3);}
 
-  for (let i = 0; i < canvasPointArr.length; i++)
+  for (let i = 0; i < realPointArr.length; i++)
   {
-    if (!canvasPointArr[i][2])
+    if (!realPointArr[i][2])
       {angTolArr.push(5);}
     else
       {angTolArr.push(10);}
@@ -535,4 +541,25 @@ function makeBezierArrays(pList) {  // first and last points can't be control po
     }
   }
   return arrOfArrs;
+}
+
+
+function computeBezier(pArr, pI, sizeRatios) {  // used in console output  // doesn't work; need to fix
+  var bCP = [];  // bCP -> bezier Control Points
+  var bP = [];  // bP -> bezier Points
+  var finish = false;
+  for (let i = pI; !finish; i++) {
+    bCP.push(pArr[i]);
+    if (pArr[i - 1] && !pArr[i])
+      { finish = true; } 
+  }
+
+  bP = UniformBezierDistributionMath(1000, pArr, 100);
+  bP.forEach(element => {
+    element[0] /= sizeRatios[0];
+    element[1] /= sizeRatios[1];
+    element.push(pArr[pI][2]);
+    element.push(true);
+  });
+  return bP;
 }
