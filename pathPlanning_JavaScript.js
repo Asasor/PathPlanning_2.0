@@ -172,7 +172,7 @@ function getPathInfo() {
   infoConsole.value = "";  // empty textbox
   let pathPrintInfo = pathMath(pointInfo,[canvas.width / realWidth, canvas.height / realHeight], 3);
 
-  for (let i = 0; i < pathPrintInfo[0].length - 1; i++)
+  for (let i = 0; i < pathPrintInfo[0].length; i++)
   {
     infoConsole.value += "new double[]{" + pathPrintInfo[0][i].toString() + ", " + pathPrintInfo[1][i].toString() + ", " + pathPrintInfo[2][i].toString() + ", " + pathPrintInfo[3][i] + ", 0.3, 0.7}\n";
   }
@@ -232,9 +232,9 @@ function refresh() {  // a bit like clear canvas but retains information that cl
 
 function drawPoints(context) {
     refresh();
+    drawMirror(context, canvas.width, canvas.height);  // draw mirror
     drawPointCircles(context, pointInfo, 8, "green", "red");
     drawArrows(context, pointInfo);
-    drawMirror(context, canvas.width, canvas.height);  // draw mirror
 
     var bezierArrs = makeBezierArrays(pointInfo);
     var bezierInfo = [];
@@ -248,6 +248,8 @@ function drawPoints(context) {
 function drawMirror(context, width, height) {
 
     context.beginPath();
+    context.fillStyle = "black";
+    context.lineWidth = 3;
     if (mirrorModeState == 1)
       {
         context.moveTo(0,height/2);
@@ -318,7 +320,7 @@ function drawRuler(context, fromx, fromy, tox, toy) {
 
 
 function pathMath(canvasPointArr, sizeRatios, decimalPlaces) {  // move to pathPlanning_infoFunctions.js later
-  let totalInfo = []; //  used for debugging
+  let totalInfo = [];  // used for debugging
   let printInfo = [];
   let realPointArr = [];
   let printDistTol = [0];
