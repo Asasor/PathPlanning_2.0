@@ -239,7 +239,7 @@ function drawPoints(context) {
     var bezierArrs = makeBezierArrays(pointInfo);
     var bezierInfo = [];
     for (var i = 0; i < bezierArrs.length; i++) {
-      bezierInfo = UniformBezierDistributionMath(1000, bezierArrs[i], 100);
+      bezierInfo = UniformBezierDistributionMath(1000, bezierArrs[i], 250);
       simplifiedDrawPointCircles(context, bezierInfo, 8, "blue");
     }
 }
@@ -556,7 +556,7 @@ function computeBezier(pArr, pI, sizeRatios) {  // used in console output  // do
       { finish = true; } 
   }
 
-  bP = UniformBezierDistributionMath(1000, pArr, 100);
+  bP = UniformBezierDistributionMath(1000, pArr, 250);
   bP.forEach(element => {
     element[0] /= sizeRatios[0];
     element[1] /= sizeRatios[1];
