@@ -239,7 +239,8 @@ function drawPoints(context) {
     var bezierArrs = makeBezierArrays(pointInfo);
     var bezierInfo = [];
     for (var i = 0; i < bezierArrs.length; i++) {
-      bezierInfo = UniformBezierDistributionMath(1000, bezierArrs[i], 250);
+      //bezierInfo = UniformBezierDistribution(1000, bezierArrs[i], 250);
+      bezierInfo = EqualSegmentBezierDistribution(1000, bezierArrs[i], 2);
       simplifiedDrawPointCircles(context, bezierInfo, 8, "blue");
     }
 }
@@ -447,12 +448,12 @@ function bezier(t, plist) {
 
 
 // taken from my research project -> https://github.com/Asasor/javascriptUniformSegmentLengthBezier
-function UniformBezierDistributionMath(acc, pList, segLen) {
+function UniformBezierDistribution(acc, pList, segLen) {
   let pDist = 0;
   let diff = 0;
   let pL = 0;
   let lpL = bezier(0, pList);  // lpL --> last point Location
-  let outList = []
+  let outList = [];
 
   for (let i = 1 / acc; i <= 1 + 1 / acc; i += 1 / acc) {  // acc --> accuracy
       pL = bezier(i, pList);
@@ -467,6 +468,31 @@ function UniformBezierDistributionMath(acc, pList, segLen) {
   }
 
   return outList;
+}
+
+
+function EqualSegmentBezierDistribution(acc, pList, segNum) {
+  let pDist = 0;
+  let diff = 0;
+  let pL = 0;
+  let lpL = bezier(0, pList);  // lpL --> last point Location
+  let totalDist = 0;
+  let segLen = 10; // lower for higher accuracy
+
+  for (let i = 1 / acc; i <= 1 + 1 / acc; i += 1 / acc) {  // acc --> accuracy
+      pL = bezier(i, pList);
+      pDist = dist(lpL.x, lpL.y, pL.x, pL.y);
+      diff = Math.abs(pDist - segLen);
+      if (diff % segLen < 50) {
+          totalDist += pDist;
+          pDist = 0;
+          lpL = pL;
+      }
+  }
+
+  segLen = totalDist / segNum;
+
+  return UniformBezierDistribution(acc, pList, segLen);
 }
 
 
@@ -556,7 +582,8 @@ function computeBezier(pArr, pI, sizeRatios) {  // used in console output  // do
       { finish = true; } 
   }
 
-  bP = UniformBezierDistributionMath(1000, pArr, 250);
+  //bP = UniformBezierDistribution(1000, pArr, 250);
+  bP = EqualSegmentBezierDistribution(1000, pArr, 2);
   bP.forEach(element => {
     element[0] /= sizeRatios[0];
     element[1] /= sizeRatios[1];
